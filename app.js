@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 8080;
 const cors = require("cors");
 app.use(
   cors({
-    origin: "headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net:8080",
+    origin: "https://headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net",
   })
 );
 
@@ -598,6 +598,5 @@ app.put("/notifications/:id/read", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on: headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net:${PORT}`);
-  console.log(`API Docs is here: headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net:${PORT}/api-docs`);
+  console.log(`Server is running on: https://headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net`);
 });
