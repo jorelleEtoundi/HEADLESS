@@ -1,4 +1,8 @@
-const express = require("express");
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 const passport = require("./passport-config");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
@@ -14,23 +18,30 @@ const { ensureRole, authenticate } = require("./middleware");
 const { BlobServiceClient } = require("@azure/storage-blob");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
-const blobServiceClient = BlobServiceClient.fromConnectionString("DefaultEndpointsProtocol=https;AccountName=storageapi90;AccountKey=jB+6C35Z0tf9HnPu5DVwb11wujK57tQWPbG9ocXY/SZd8IlkIrIXDfUZ7+O8qWiLFCahJMKVMVzJ+ASt6ggSXw==;EndpointSuffix=core.windows.net");
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  "DefaultEndpointsProtocol=https;AccountName=storageapi90;AccountKey=jB+6C35Z0tf9HnPu5DVwb11wujK57tQWPbG9ocXY/SZd8IlkIrIXDfUZ7+O8qWiLFCahJMKVMVzJ+ASt6ggSXw==;EndpointSuffix=core.windows.net"
+);
 const containerClient = blobServiceClient.getContainerClient("imagecontent");
 
-const app = express();
-const PORT = process.env.PORT || 8080;
+// var indexRouter = require('./routes/index');
+// var usersRouter = require('./routes/users');
 
-const cors = require("cors");
-app.use(
-  cors({
-    origin: "https://headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net",
-  })
-);
+var app = express();
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
@@ -597,6 +608,21 @@ app.put("/notifications/:id/read", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on: https://headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net`);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
 });
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;

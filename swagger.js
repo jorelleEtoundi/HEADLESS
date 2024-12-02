@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://headless-fjdchfd4hwe2ggd2.francecentral-01.azurewebsites.net",
       },
     ],
   },
